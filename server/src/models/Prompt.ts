@@ -4,7 +4,11 @@ const promptSchema = new Schema(
   {
     title: { type: String, required: true },
     content: { type: String, required: true },
-    category: { type: String, required: true },
+    category: { 
+      type: String, 
+      required: true,
+      enum: ['Coding', 'Marketing', 'Content Writing', 'Email', 'Resume', 'SQL', 'Design', 'Social Media', 'Productivity', 'Others']
+    },
     tags: { type: [String], default: [] },
     description: { type: String, default: '' },
     isFavorite: { type: Boolean, default: false },
