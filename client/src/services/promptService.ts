@@ -24,6 +24,15 @@ export const createPrompt = async (prompt: Omit<Prompt, 'id' | 'createdAt' | 'up
   return handleResponse(res);
 };
 
+export const bulkCreatePrompts = async (prompts: Omit<Prompt, 'id' | 'createdAt' | 'updatedAt'>[]): Promise<Prompt[]> => {
+  const res = await fetch(`${API_BASE}/prompts/bulk`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(prompts),
+  });
+  return handleResponse(res);
+};
+
 export const updatePrompt = async (id: string, updates: Partial<Prompt>): Promise<Prompt> => {
   const res = await fetch(`${API_BASE}/prompts/${id}`, {
     method: 'PUT',

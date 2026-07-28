@@ -8,6 +8,7 @@ interface PromptContextType {
   error: string | null;
   loadPrompts: () => Promise<void>;
   addPrompt: (promptData: Omit<Prompt, 'id' | 'createdAt' | 'updatedAt'>) => Promise<void>;
+  bulkAddPrompts: (prompts: Omit<Prompt, 'id' | 'createdAt' | 'updatedAt'>[]) => Promise<void>;
   editPrompt: (id: string, updates: Partial<Prompt>) => Promise<void>;
   removePrompt: (id: string) => Promise<void>;
   toggleFavorite: (id: string) => Promise<void>;
@@ -131,6 +132,33 @@ export const PromptProvider: React.FC<{ children: React.ReactNode }> = ({ childr
     }
   };
 
+  const bulkAddPrompts = async (newPrompts: Omit<Prompt, 'id' | 'createdAt' | 'updatedAt'>[]) => {
+    setError(null);
+    const originalList = [...prompts];
+    
+    // Optimistic UI temp entries
+    const tempPrompts: Prompt[] = newPrompts.map((p, index) => ({
+      ...p,
+      id: `temp-bulk-${Date.now()}-${index}`,
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
+    }));
+
+    const updatedList = [...prompts, ...tempPrompts];
+    saveLocally(updatedList);
+
+    try {
+      const savedPrompts = await api.bulkCreatePrompts(newPrompts);
+      // Replace all temporary items with saved ones (append to original list)
+      const syncedList = [...originalList, ...savedPrompts];
+      saveLocally(syncedList);
+    } catch (err: any) {
+      setError(err.message || 'Failed to bulk create prompts on server');
+      saveLocally(originalList);
+      throw err;
+    }
+  };
+
   return (
     <PromptContext.Provider
       value={{
@@ -139,6 +167,7 @@ export const PromptProvider: React.FC<{ children: React.ReactNode }> = ({ childr
         error,
         loadPrompts,
         addPrompt,
+        bulkAddPrompts,
         editPrompt,
         removePrompt,
         toggleFavorite,

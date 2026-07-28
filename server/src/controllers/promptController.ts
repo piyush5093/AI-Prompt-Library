@@ -75,17 +75,17 @@ export const deletePrompt = async (req: Request, res: Response): Promise<void> =
 
 export const reorderPrompts = async (req: Request, res: Response): Promise<void> => {
   try {
-    const updates: { id: string, order: number }[] = req.body;
+    const { updates } = req.body;
     
     if (!Array.isArray(updates)) {
-      res.status(400).json({ error: 'Expected an array of {id, order}' });
+      res.status(400).json({ error: 'Updates must be an array' });
       return;
     }
 
-    const bulkOps = updates.map(item => ({
+    const bulkOps = updates.map((update: any) => ({
       updateOne: {
-        filter: { _id: item.id },
-        update: { order: item.order }
+        filter: { _id: update.id },
+        update: { $set: { order: update.order } }
       }
     }));
 
@@ -93,8 +93,23 @@ export const reorderPrompts = async (req: Request, res: Response): Promise<void>
       await Prompt.bulkWrite(bulkOps);
     }
     
-    res.json({ message: 'Reordered successfully' });
-  } catch (err) {
-    handleError(res, err);
+    res.json({ message: 'Prompts reordered successfully' });
+  } catch (error) {
+    res.status(500).json({ error: 'Failed to reorder prompts' });
+  }
+};
+
+export const bulkCreatePrompts = async (req: Request, res: Response): Promise<void> => {
+  try {
+    const prompts = req.body;
+    if (!Array.isArray(prompts) || prompts.length === 0) {
+      res.status(400).json({ error: 'Payload must be a non-empty array of prompts' });
+      return;
+    }
+
+    const created = await Prompt.insertMany(prompts);
+    res.status(201).json(created);
+  } catch (error: any) {
+    res.status(500).json({ error: error.message || 'Failed to bulk create prompts' });
   }
 };
