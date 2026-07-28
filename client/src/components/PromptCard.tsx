@@ -118,6 +118,7 @@ export const PromptCard: React.FC<PromptCardProps> = ({
               onClick={handleTogglePin}
               className={`p-1.5 rounded transition-colors ${prompt.isPinned ? 'text-slate-700 dark:text-zinc-200 bg-slate-100 dark:bg-zinc-800' : 'text-slate-400 hover:text-slate-600 dark:hover:text-zinc-300 hover:bg-slate-50 dark:hover:bg-zinc-800/50'}`}
               title={prompt.isPinned ? "Unpin" : "Pin"}
+              aria-label={prompt.isPinned ? "Unpin prompt" : "Pin prompt"}
             >
               <Pin className="w-4 h-4" />
             </button>
@@ -125,6 +126,7 @@ export const PromptCard: React.FC<PromptCardProps> = ({
               onClick={handleToggleFavorite}
               className={`p-1.5 rounded transition-colors ${prompt.isFavorite ? 'text-amber-500 hover:text-amber-600 bg-amber-50 dark:bg-amber-500/10' : 'text-slate-400 hover:text-slate-600 dark:hover:text-zinc-300 hover:bg-slate-50 dark:hover:bg-zinc-800/50'}`}
               title={prompt.isFavorite ? "Unfavorite" : "Favorite"}
+              aria-label={prompt.isFavorite ? "Remove from favorites" : "Add to favorites"}
             >
               <Star className="w-4 h-4" fill={prompt.isFavorite ? 'currentColor' : 'none'} />
             </button>
@@ -175,6 +177,7 @@ export const PromptCard: React.FC<PromptCardProps> = ({
             onClick={handleCopy}
             className="p-1.5 text-slate-400 hover:text-slate-700 dark:hover:text-zinc-200 transition-colors"
             title="Copy to clipboard"
+            aria-label="Copy prompt content to clipboard"
           >
             <Copy className="w-4 h-4" />
           </button>
@@ -182,6 +185,7 @@ export const PromptCard: React.FC<PromptCardProps> = ({
             onClick={handleDuplicate}
             className="p-1.5 text-slate-400 hover:text-slate-700 dark:hover:text-zinc-200 transition-colors"
             title="Duplicate"
+            aria-label="Duplicate prompt"
           >
             <CopyPlus className="w-4 h-4" />
           </button>
@@ -191,6 +195,7 @@ export const PromptCard: React.FC<PromptCardProps> = ({
             onClick={handleEdit}
             className="p-1.5 text-slate-400 hover:text-blue-600 dark:hover:text-blue-400 transition-colors"
             title="Edit"
+            aria-label="Edit prompt"
           >
             <Edit2 className="w-4 h-4" />
           </button>
@@ -198,6 +203,7 @@ export const PromptCard: React.FC<PromptCardProps> = ({
             onClick={handleDelete}
             className="p-1.5 text-slate-400 hover:text-red-600 dark:hover:text-red-400 transition-colors"
             title="Delete"
+            aria-label="Delete prompt"
           >
             <Trash2 className="w-4 h-4" />
           </button>

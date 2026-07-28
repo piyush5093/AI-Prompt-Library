@@ -4,13 +4,14 @@ import { usePrompts } from '../context/PromptContext';
 import { useToast } from '../context/ToastContext';
 import { exportPrompts } from '../utils/exportPrompts';
 import { importPrompts } from '../utils/importPrompts';
-import { Download, Upload } from 'lucide-react';
+import { Download, Upload, Menu } from 'lucide-react';
 
 interface NavbarProps {
   onNewClick: () => void;
+  onToggleSidebar: () => void;
 }
 
-export const Navbar: React.FC<NavbarProps> = ({ onNewClick }) => {
+export const Navbar: React.FC<NavbarProps> = ({ onNewClick, onToggleSidebar }) => {
   const { theme, toggleTheme } = useTheme();
   const { prompts, bulkAddPrompts } = usePrompts();
   const { showToast } = useToast();
@@ -28,6 +29,7 @@ export const Navbar: React.FC<NavbarProps> = ({ onNewClick }) => {
   const handleImportClick = () => {
     if (fileInputRef.current) {
       fileInputRef.current.value = ''; // Reset input so same file can be selected again
+      fileInputRef.current.focus(); // Wait, let's make sure it just resets
       fileInputRef.current.click();
     }
   };
@@ -47,7 +49,14 @@ export const Navbar: React.FC<NavbarProps> = ({ onNewClick }) => {
 
   return (
     <header className="border-b border-slate-200 dark:border-zinc-800 bg-white dark:bg-[#0f0f0f] py-4 px-6 flex items-center justify-between">
-      <div className="flex items-center gap-2">
+      <div className="flex items-center gap-3">
+        <button
+          onClick={onToggleSidebar}
+          className="p-1.5 -ml-1 text-slate-500 hover:text-slate-700 dark:text-zinc-400 dark:hover:text-zinc-200 md:hidden"
+          aria-label="Toggle sidebar filters"
+        >
+          <Menu className="w-5 h-5" />
+        </button>
         <h1 className="text-xl font-bold tracking-tight text-slate-900 dark:text-zinc-50">
           AI Prompt Library
         </h1>

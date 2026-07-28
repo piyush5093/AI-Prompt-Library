@@ -6,6 +6,7 @@ interface PromptContextType {
   prompts: Prompt[];
   loading: boolean;
   error: string | null;
+  isOffline: boolean;
   loadPrompts: () => Promise<void>;
   addPrompt: (promptData: Omit<Prompt, 'id' | 'createdAt' | 'updatedAt'>) => Promise<void>;
   bulkAddPrompts: (prompts: Omit<Prompt, 'id' | 'createdAt' | 'updatedAt'>[]) => Promise<void>;
@@ -25,6 +26,7 @@ export const PromptProvider: React.FC<{ children: React.ReactNode }> = ({ childr
   });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [isOffline, setIsOffline] = useState(false);
 
   const saveLocally = (list: Prompt[]) => {
     setPrompts(list);
@@ -37,7 +39,9 @@ export const PromptProvider: React.FC<{ children: React.ReactNode }> = ({ childr
     try {
       const data = await api.fetchPrompts();
       saveLocally(data);
+      setIsOffline(false);
     } catch (err: any) {
+      setIsOffline(true);
       setError(err.message || 'Failed to fetch prompts');
     } finally {
       setLoading(false);
@@ -165,6 +169,7 @@ export const PromptProvider: React.FC<{ children: React.ReactNode }> = ({ childr
         prompts,
         loading,
         error,
+        isOffline,
         loadPrompts,
         addPrompt,
         bulkAddPrompts,

@@ -37,7 +37,7 @@ export const Dashboard: React.FC<DashboardProps> = ({
   favoritesOnly,
   onClearFilters,
 }) => {
-  const { prompts, loading, error, removePrompt, reorder } = usePrompts();
+  const { prompts, loading, error, isOffline, loadPrompts, removePrompt, reorder } = usePrompts();
 
   const [searchTerm, setSearchTerm] = useState('');
   const [sortOption, setSortOption] = useState<SortOption>('newest');
@@ -164,8 +164,21 @@ export const Dashboard: React.FC<DashboardProps> = ({
         </div>
       </div>
 
-      {error && (
-        <div className="mb-6 p-4 bg-red-500/10 border border-red-500/20 text-red-600 dark:text-red-400 rounded text-sm">
+      {isOffline && (
+        <div className="mb-6 p-3 bg-amber-500/10 border border-amber-500/20 text-amber-700 dark:text-amber-400 rounded text-sm flex items-center justify-between" role="status">
+          <span>Working offline — changes will sync when connection is restored</span>
+          <button 
+            onClick={() => loadPrompts()} 
+            className="text-xs underline hover:no-underline font-semibold"
+            aria-label="Retry connection to server"
+          >
+            Retry connection
+          </button>
+        </div>
+      )}
+
+      {error && !isOffline && (
+        <div className="mb-6 p-4 bg-red-500/10 border border-red-500/20 text-red-600 dark:text-red-400 rounded text-sm" role="alert">
           {error}
         </div>
       )}
@@ -218,7 +231,30 @@ export const Dashboard: React.FC<DashboardProps> = ({
           )}
         </div>
         
-        {filteredPrompts.length === 0 ? (
+        {loading && totalPrompts === 0 ? (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+            {[...Array(8)].map((_, i) => (
+              <div key={i} className="animate-pulse bg-white dark:bg-[#111] border border-slate-200 dark:border-zinc-800 rounded h-[280px] p-5 flex flex-col justify-between">
+                <div>
+                  <div className="flex justify-between items-center mb-3">
+                    <div className="h-4 bg-slate-200 dark:bg-zinc-800 rounded w-16"></div>
+                    <div className="h-4 bg-slate-200 dark:bg-zinc-800 rounded w-12"></div>
+                  </div>
+                  <div className="h-6 bg-slate-200 dark:bg-zinc-800 rounded w-3/4 mb-4"></div>
+                  <div className="space-y-2">
+                    <div className="h-4 bg-slate-200 dark:bg-zinc-800 rounded"></div>
+                    <div className="h-4 bg-slate-200 dark:bg-zinc-800 rounded w-5/6"></div>
+                    <div className="h-4 bg-slate-200 dark:bg-zinc-800 rounded w-2/3"></div>
+                  </div>
+                </div>
+                <div className="flex justify-between items-center pt-3 border-t border-slate-100 dark:border-zinc-800">
+                  <div className="h-4 bg-slate-200 dark:bg-zinc-800 rounded w-24"></div>
+                  <div className="h-4 bg-slate-200 dark:bg-zinc-800 rounded w-12"></div>
+                </div>
+              </div>
+            ))}
+          </div>
+        ) : filteredPrompts.length === 0 ? (
           <div className="py-16 flex flex-col items-center justify-center text-center">
             <p className="text-slate-600 dark:text-zinc-400 font-medium mb-2">No prompts found</p>
             {isFilterActive ? (
