@@ -10,6 +10,8 @@ import { PromptFormModal } from './components/PromptFormModal';
 
 function App() {
   const [isFormOpen, setIsFormOpen] = useState(false);
+  const [categoryFilter, setCategoryFilter] = useState<string | null>(null);
+  const [favoritesOnly, setFavoritesOnly] = useState(false);
 
   return (
     <ThemeProvider>
@@ -20,8 +22,20 @@ function App() {
             <PromptFormModal isOpen={isFormOpen} onClose={() => setIsFormOpen(false)} initialData={null} />
             <Navbar onNewClick={() => setIsFormOpen(true)} />
             <div className="flex flex-1 overflow-hidden">
-              <Sidebar />
-              <Dashboard />
+              <Sidebar 
+                activeCategory={categoryFilter}
+                onCategoryChange={setCategoryFilter}
+                favoritesOnly={favoritesOnly}
+                onFavoritesChange={setFavoritesOnly}
+              />
+              <Dashboard 
+                categoryFilter={categoryFilter}
+                favoritesOnly={favoritesOnly}
+                onClearFilters={() => {
+                  setCategoryFilter(null);
+                  setFavoritesOnly(false);
+                }}
+              />
             </div>
           </div>
         </PromptProvider>

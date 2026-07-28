@@ -4,26 +4,51 @@ import { PromptCard } from './PromptCard';
 import { PromptDetailsModal } from './PromptDetailsModal';
 import { PromptFormModal } from './PromptFormModal';
 import { DeleteConfirmDialog } from './DeleteConfirmDialog';
+import { SearchBar } from './SearchBar';
+import { useDebounce } from '../hooks/useDebounce';
+import { useFilteredPrompts } from '../hooks/useFilteredPrompts';
+import type { SortOption } from '../hooks/useFilteredPrompts';
 import type { Prompt } from '../types/types';
 
-export const Dashboard: React.FC = () => {
+interface DashboardProps {
+  categoryFilter: string | null;
+  favoritesOnly: boolean;
+  onClearFilters: () => void;
+}
+
+export const Dashboard: React.FC<DashboardProps> = ({
+  categoryFilter,
+  favoritesOnly,
+  onClearFilters,
+}) => {
   const { prompts, loading, error, removePrompt } = usePrompts();
 
+  // Search and Sort State
+  const [searchTerm, setSearchTerm] = useState('');
+  const [sortOption, setSortOption] = useState<SortOption>('newest');
+  
+  // Debounce search term for 300ms
+  const debouncedSearchTerm = useDebounce(searchTerm, 300);
+
+  // Apply filtering & sorting
+  const filteredPrompts = useFilteredPrompts(
+    prompts,
+    debouncedSearchTerm,
+    categoryFilter,
+    favoritesOnly,
+    sortOption
+  );
+
+  // Modals state
   const [selectedPrompt, setSelectedPrompt] = useState<Prompt | null>(null);
   const [isDetailsOpen, setIsDetailsOpen] = useState(false);
   const [isEditFormOpen, setIsEditFormOpen] = useState(false);
-  
   const [promptToDelete, setPromptToDelete] = useState<Prompt | null>(null);
 
+  // Stat cards logic (using UNFILTERED RAW data)
   const totalPrompts = prompts.length;
   const favoritePrompts = prompts.filter(p => p.isFavorite).length;
   const activeCategoriesCount = new Set(prompts.map(p => p.category)).size;
-
-  const sortedPrompts = [...prompts].sort((a, b) => {
-    if (a.isPinned && !b.isPinned) return -1;
-    if (!a.isPinned && b.isPinned) return 1;
-    return new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime();
-  });
 
   const handleCardClick = (prompt: Prompt) => {
     setSelectedPrompt(prompt);
@@ -52,7 +77,7 @@ export const Dashboard: React.FC = () => {
 
   return (
     <div className="flex-1 p-8 overflow-y-auto bg-slate-50/30 dark:bg-[#0a0a0a] text-slate-800 dark:text-zinc-200">
-      <div className="flex justify-between items-center mb-8">
+      <div className="flex justify-between items-end mb-8 gap-4">
         <div>
           <h2 className="text-2xl font-bold tracking-tight text-slate-900 dark:text-zinc-50">
             Dashboard
@@ -60,6 +85,21 @@ export const Dashboard: React.FC = () => {
           <p className="text-sm text-slate-500 dark:text-zinc-500 mt-1">
             Overview of your saved AI prompts
           </p>
+        </div>
+        
+        <div className="flex items-center gap-4 flex-1 justify-end max-w-2xl">
+          <SearchBar value={searchTerm} onChange={setSearchTerm} />
+          
+          <select
+            value={sortOption}
+            onChange={(e) => setSortOption(e.target.value as SortOption)}
+            className="w-32 px-3 py-2 border border-slate-200 dark:border-zinc-800 rounded-md leading-5 bg-white dark:bg-[#111] text-slate-900 dark:text-zinc-100 focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500 sm:text-sm transition-colors cursor-pointer"
+          >
+            <option value="newest">Newest</option>
+            <option value="oldest">Oldest</option>
+            <option value="a-z">A to Z</option>
+            <option value="z-a">Z to A</option>
+          </select>
         </div>
       </div>
 
@@ -69,6 +109,7 @@ export const Dashboard: React.FC = () => {
         </div>
       )}
 
+      {/* Stat Cards - Unfiltered Counts */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
         <div className="border border-slate-200 dark:border-zinc-800 bg-white dark:bg-[#111] p-6 rounded">
           <span className="text-xs font-semibold text-slate-400 dark:text-zinc-600 uppercase tracking-wider">
@@ -99,16 +140,49 @@ export const Dashboard: React.FC = () => {
       </div>
 
       <div className="mb-4">
-        <h3 className="text-sm font-semibold text-slate-400 dark:text-zinc-600 uppercase tracking-wider mb-4">
-          All Prompts
-        </h3>
-        {sortedPrompts.length === 0 ? (
-          <p className="text-sm text-slate-400 dark:text-zinc-600 p-8 border border-slate-200 dark:border-zinc-800 border-dashed rounded text-center">
-            No prompts found. Click "New Prompt" to create one.
-          </p>
+        <div className="flex items-center justify-between mb-4">
+          <h3 className="text-sm font-semibold text-slate-400 dark:text-zinc-600 uppercase tracking-wider">
+            {debouncedSearchTerm ? 'Search Results' : 'All Prompts'}
+          </h3>
+          {(categoryFilter || favoritesOnly || debouncedSearchTerm) && (
+            <button
+              onClick={() => {
+                onClearFilters();
+                setSearchTerm('');
+              }}
+              className="text-xs text-blue-600 dark:text-blue-400 hover:underline"
+            >
+              Clear filters
+            </button>
+          )}
+        </div>
+        
+        {filteredPrompts.length === 0 ? (
+          <div className="py-16 flex flex-col items-center justify-center text-center">
+            <p className="text-slate-600 dark:text-zinc-400 font-medium mb-2">No prompts found</p>
+            {(categoryFilter || favoritesOnly || debouncedSearchTerm) ? (
+              <p className="text-sm text-slate-400 dark:text-zinc-500">
+                Try adjusting your search or{' '}
+                <button 
+                  onClick={() => {
+                    onClearFilters();
+                    setSearchTerm('');
+                  }}
+                  className="text-blue-600 dark:text-blue-400 hover:underline"
+                >
+                  clearing filters
+                </button>
+                .
+              </p>
+            ) : (
+              <p className="text-sm text-slate-400 dark:text-zinc-500">
+                You haven't added any prompts yet. Click "New Prompt" to get started.
+              </p>
+            )}
+          </div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-            {sortedPrompts.map(p => (
+            {filteredPrompts.map(p => (
               <PromptCard
                 key={p.id}
                 prompt={p}
