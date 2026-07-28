@@ -1,7 +1,11 @@
 import React from 'react';
 import { useTheme } from '../context/ThemeContext';
 
-export const Navbar: React.FC = () => {
+interface NavbarProps {
+  onNewClick: () => void;
+}
+
+export const Navbar: React.FC<NavbarProps> = ({ onNewClick }) => {
   const { theme, toggleTheme } = useTheme();
 
   return (
@@ -18,7 +22,10 @@ export const Navbar: React.FC = () => {
         >
           {theme === 'light' ? 'Dark Mode' : 'Light Mode'}
         </button>
-        <button className="bg-slate-700 hover:bg-slate-800 dark:bg-zinc-800 dark:hover:bg-zinc-700 text-white font-medium py-2 px-4 rounded text-sm transition-colors">
+        <button 
+          onClick={onNewClick}
+          className="bg-slate-700 hover:bg-slate-800 dark:bg-zinc-800 dark:hover:bg-zinc-700 text-white font-medium py-2 px-4 rounded text-sm transition-colors"
+        >
           New Prompt
         </button>
       </div>
