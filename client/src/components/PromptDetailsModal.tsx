@@ -100,10 +100,12 @@ export const PromptDetailsModal: React.FC<PromptDetailsModalProps> = ({
               </span>
             )}
           </div>
-          <div className="flex items-center gap-2 text-xs text-slate-500 dark:text-zinc-500 mb-4">
+          <div className="flex flex-wrap items-center gap-x-2 gap-y-1 text-xs text-slate-500 dark:text-zinc-500 mb-4">
             <span className="px-2 py-0.5 bg-slate-100 dark:bg-zinc-800 text-slate-600 dark:text-zinc-400 rounded border border-slate-200 dark:border-zinc-700">
               {prompt.category}
             </span>
+            <span>•</span>
+            <span>Created {formatRelativeDate(prompt.createdAt)}</span>
             <span>•</span>
             <span>Updated {formatRelativeDate(prompt.updatedAt)}</span>
           </div>

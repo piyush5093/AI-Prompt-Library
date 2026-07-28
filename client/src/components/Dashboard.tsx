@@ -75,12 +75,17 @@ export const Dashboard: React.FC<DashboardProps> = ({
     setPromptToDelete(prompt);
   };
 
+  const [isDeleting, setIsDeleting] = useState(false);
+
   const confirmDelete = async () => {
     if (promptToDelete) {
+      setIsDeleting(true);
       try {
         await removePrompt(promptToDelete.id);
       } catch (e) {
         console.error(e);
+      } finally {
+        setIsDeleting(false);
       }
     }
     setPromptToDelete(null);
@@ -337,6 +342,7 @@ export const Dashboard: React.FC<DashboardProps> = ({
         isOpen={!!promptToDelete}
         onConfirm={confirmDelete}
         onCancel={() => setPromptToDelete(null)}
+        isDeleting={isDeleting}
       />
     </div>
   );

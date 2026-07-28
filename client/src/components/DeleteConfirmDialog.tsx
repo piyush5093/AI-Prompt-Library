@@ -4,12 +4,14 @@ interface DeleteConfirmDialogProps {
   isOpen: boolean;
   onConfirm: () => void;
   onCancel: () => void;
+  isDeleting?: boolean;
 }
 
 export const DeleteConfirmDialog: React.FC<DeleteConfirmDialogProps> = ({
   isOpen,
   onConfirm,
   onCancel,
+  isDeleting = false,
 }) => {
   const cancelBtnRef = useRef<HTMLButtonElement>(null);
 
@@ -36,15 +38,21 @@ export const DeleteConfirmDialog: React.FC<DeleteConfirmDialogProps> = ({
           <button
             ref={cancelBtnRef}
             onClick={onCancel}
-            className="px-4 py-2 text-sm font-medium rounded text-slate-700 dark:text-zinc-300 hover:bg-slate-100 dark:hover:bg-zinc-800 transition-colors"
+            disabled={isDeleting}
+            className="px-4 py-2 text-sm font-medium rounded text-slate-700 dark:text-zinc-300 hover:bg-slate-100 dark:hover:bg-zinc-800 transition-colors disabled:opacity-50"
           >
             Cancel
           </button>
           <button
             onClick={onConfirm}
-            className="px-4 py-2 text-sm font-medium rounded bg-red-600 hover:bg-red-700 text-white transition-colors"
+            disabled={isDeleting}
+            className="px-4 py-2 text-sm font-medium rounded bg-red-600 hover:bg-red-700 text-white transition-colors disabled:opacity-50 flex items-center justify-center min-w-[80px]"
           >
-            Delete
+            {isDeleting ? (
+              <span className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></span>
+            ) : (
+              'Delete'
+            )}
           </button>
         </div>
       </div>

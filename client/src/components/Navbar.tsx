@@ -1,4 +1,4 @@
-import React, { useRef } from 'react';
+import React, { useRef, useState } from 'react';
 import { useTheme } from '../context/ThemeContext';
 import { usePrompts } from '../context/PromptContext';
 import { useToast } from '../context/ToastContext';
@@ -17,6 +17,8 @@ export const Navbar: React.FC<NavbarProps> = ({ onNewClick, onToggleSidebar }) =
   const { showToast } = useToast();
   const fileInputRef = useRef<HTMLInputElement>(null);
 
+  const [isImporting, setIsImporting] = useState(false);
+
   const handleExport = () => {
     if (prompts.length === 0) {
       showToast('No prompts to export', 'error');
@@ -27,6 +29,7 @@ export const Navbar: React.FC<NavbarProps> = ({ onNewClick, onToggleSidebar }) =
   };
 
   const handleImportClick = () => {
+    if (isImporting) return;
     if (fileInputRef.current) {
       fileInputRef.current.value = ''; // Reset input so same file can be selected again
       fileInputRef.current.focus(); // Wait, let's make sure it just resets
@@ -38,12 +41,15 @@ export const Navbar: React.FC<NavbarProps> = ({ onNewClick, onToggleSidebar }) =
     const file = e.target.files?.[0];
     if (!file) return;
 
+    setIsImporting(true);
     try {
       const validPrompts = await importPrompts(file);
       await bulkAddPrompts(validPrompts);
       showToast(`Imported ${validPrompts.length} prompts successfully`, 'success');
     } catch (err: any) {
       showToast(err.message || 'Import failed', 'error');
+    } finally {
+      setIsImporting(false);
     }
   };
 
@@ -73,11 +79,17 @@ export const Navbar: React.FC<NavbarProps> = ({ onNewClick, onToggleSidebar }) =
 
         <button
           onClick={handleImportClick}
-          className="flex items-center gap-2 p-2 rounded border border-slate-200 dark:border-zinc-800 hover:bg-slate-50 dark:hover:bg-zinc-900 text-slate-700 dark:text-zinc-300 transition-colors text-sm font-medium"
+          disabled={isImporting}
+          className="flex items-center gap-2 p-2 rounded border border-slate-200 dark:border-zinc-800 hover:bg-slate-50 dark:hover:bg-zinc-900 text-slate-700 dark:text-zinc-300 transition-colors text-sm font-medium disabled:opacity-50"
           title="Import prompts from JSON"
+          aria-label={isImporting ? "Importing prompts..." : "Import prompts from JSON"}
         >
-          <Upload className="w-4 h-4" />
-          <span className="hidden sm:inline">Import</span>
+          {isImporting ? (
+            <span className="w-4 h-4 border-2 border-slate-700 dark:border-zinc-300 border-t-transparent rounded-full animate-spin"></span>
+          ) : (
+            <Upload className="w-4 h-4" />
+          )}
+          <span className="hidden sm:inline">{isImporting ? 'Importing...' : 'Import'}</span>
         </button>
         <input 
           type="file" 
