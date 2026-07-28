@@ -10,6 +10,22 @@ import { useFilteredPrompts } from '../hooks/useFilteredPrompts';
 import type { SortOption } from '../hooks/useFilteredPrompts';
 import type { Prompt } from '../types/types';
 
+import {
+  DndContext,
+  closestCenter,
+  KeyboardSensor,
+  PointerSensor,
+  useSensor,
+  useSensors,
+} from '@dnd-kit/core';
+import type { DragEndEvent } from '@dnd-kit/core';
+import {
+  arrayMove,
+  SortableContext,
+  sortableKeyboardCoordinates,
+  rectSortingStrategy,
+} from '@dnd-kit/sortable';
+
 interface DashboardProps {
   categoryFilter: string | null;
   favoritesOnly: boolean;
@@ -21,16 +37,13 @@ export const Dashboard: React.FC<DashboardProps> = ({
   favoritesOnly,
   onClearFilters,
 }) => {
-  const { prompts, loading, error, removePrompt } = usePrompts();
+  const { prompts, loading, error, removePrompt, reorder } = usePrompts();
 
-  // Search and Sort State
   const [searchTerm, setSearchTerm] = useState('');
   const [sortOption, setSortOption] = useState<SortOption>('newest');
   
-  // Debounce search term for 300ms
   const debouncedSearchTerm = useDebounce(searchTerm, 300);
 
-  // Apply filtering & sorting
   const filteredPrompts = useFilteredPrompts(
     prompts,
     debouncedSearchTerm,
@@ -39,13 +52,11 @@ export const Dashboard: React.FC<DashboardProps> = ({
     sortOption
   );
 
-  // Modals state
   const [selectedPrompt, setSelectedPrompt] = useState<Prompt | null>(null);
   const [isDetailsOpen, setIsDetailsOpen] = useState(false);
   const [isEditFormOpen, setIsEditFormOpen] = useState(false);
   const [promptToDelete, setPromptToDelete] = useState<Prompt | null>(null);
 
-  // Stat cards logic (using UNFILTERED RAW data)
   const totalPrompts = prompts.length;
   const favoritePrompts = prompts.filter(p => p.isFavorite).length;
   const activeCategoriesCount = new Set(prompts.map(p => p.category)).size;
@@ -74,6 +85,56 @@ export const Dashboard: React.FC<DashboardProps> = ({
     }
     setPromptToDelete(null);
   };
+
+  // DND setup
+  const sensors = useSensors(
+    useSensor(PointerSensor, { activationConstraint: { distance: 5 } }),
+    useSensor(KeyboardSensor, { coordinateGetter: sortableKeyboardCoordinates })
+  );
+
+  const isFilterActive = !!categoryFilter || favoritesOnly || !!debouncedSearchTerm;
+  const isCustomSort = sortOption !== 'newest';
+  const isDraggable = !isFilterActive && !isCustomSort;
+
+  const handleDragEnd = (event: DragEndEvent) => {
+    const { active, over } = event;
+    if (!over || active.id === over.id) return;
+
+    const oldIndex = filteredPrompts.findIndex(p => p.id === active.id);
+    const newIndex = filteredPrompts.findIndex(p => p.id === over.id);
+    
+    if (oldIndex === -1 || newIndex === -1) return;
+    
+    const activeItem = filteredPrompts[oldIndex];
+    const overItem = filteredPrompts[newIndex];
+
+    // Prevent dragging across pinned/unpinned boundaries
+    if (activeItem.isPinned !== overItem.isPinned) return;
+
+    // We only reorder within the specific group (pinned or unpinned)
+    const isPinnedGroup = activeItem.isPinned;
+    const groupItems = filteredPrompts.filter(p => p.isPinned === isPinnedGroup);
+    
+    const groupOldIndex = groupItems.findIndex(p => p.id === active.id);
+    const groupNewIndex = groupItems.findIndex(p => p.id === over.id);
+
+    const reorderedGroup = arrayMove(groupItems, groupOldIndex, groupNewIndex);
+
+    // Re-calculate the absolute array order
+    const otherGroup = filteredPrompts.filter(p => p.isPinned !== isPinnedGroup);
+    
+    // Combine them back in standard order (pinned first)
+    const combined = isPinnedGroup ? [...reorderedGroup, ...otherGroup] : [...otherGroup, ...reorderedGroup];
+    
+    // Assign sequential order values based on the newly combined array
+    // We update all prompts in this list to ensure absolute sequential order is maintained
+    const newPromptsWithOrder = combined.map((p, idx) => ({ ...p, order: idx }));
+    
+    reorder(newPromptsWithOrder).catch(console.error);
+  };
+
+  const pinnedPrompts = filteredPrompts.filter(p => p.isPinned);
+  const unpinnedPrompts = filteredPrompts.filter(p => !p.isPinned);
 
   return (
     <div className="flex-1 p-8 overflow-y-auto bg-slate-50/30 dark:bg-[#0a0a0a] text-slate-800 dark:text-zinc-200">
@@ -142,9 +203,9 @@ export const Dashboard: React.FC<DashboardProps> = ({
       <div className="mb-4">
         <div className="flex items-center justify-between mb-4">
           <h3 className="text-sm font-semibold text-slate-400 dark:text-zinc-600 uppercase tracking-wider">
-            {debouncedSearchTerm ? 'Search Results' : 'All Prompts'}
+            {isFilterActive ? 'Search Results' : 'All Prompts'}
           </h3>
-          {(categoryFilter || favoritesOnly || debouncedSearchTerm) && (
+          {isFilterActive && (
             <button
               onClick={() => {
                 onClearFilters();
@@ -160,7 +221,7 @@ export const Dashboard: React.FC<DashboardProps> = ({
         {filteredPrompts.length === 0 ? (
           <div className="py-16 flex flex-col items-center justify-center text-center">
             <p className="text-slate-600 dark:text-zinc-400 font-medium mb-2">No prompts found</p>
-            {(categoryFilter || favoritesOnly || debouncedSearchTerm) ? (
+            {isFilterActive ? (
               <p className="text-sm text-slate-400 dark:text-zinc-500">
                 Try adjusting your search or{' '}
                 <button 
@@ -181,17 +242,42 @@ export const Dashboard: React.FC<DashboardProps> = ({
             )}
           </div>
         ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-            {filteredPrompts.map(p => (
-              <PromptCard
-                key={p.id}
-                prompt={p}
-                onClick={() => handleCardClick(p)}
-                onEdit={() => handleEditClick(p)}
-                onDelete={() => handleDeleteClick(p)}
-              />
-            ))}
-          </div>
+          <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
+            <div className="space-y-6">
+              {pinnedPrompts.length > 0 && (
+                <SortableContext items={pinnedPrompts.map(p => p.id)} strategy={rectSortingStrategy}>
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+                    {pinnedPrompts.map(p => (
+                      <PromptCard
+                        key={p.id}
+                        prompt={p}
+                        isDraggable={isDraggable}
+                        onClick={() => handleCardClick(p)}
+                        onEdit={() => handleEditClick(p)}
+                        onDelete={() => handleDeleteClick(p)}
+                      />
+                    ))}
+                  </div>
+                </SortableContext>
+              )}
+              {unpinnedPrompts.length > 0 && (
+                <SortableContext items={unpinnedPrompts.map(p => p.id)} strategy={rectSortingStrategy}>
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+                    {unpinnedPrompts.map(p => (
+                      <PromptCard
+                        key={p.id}
+                        prompt={p}
+                        isDraggable={isDraggable}
+                        onClick={() => handleCardClick(p)}
+                        onEdit={() => handleEditClick(p)}
+                        onDelete={() => handleDeleteClick(p)}
+                      />
+                    ))}
+                  </div>
+                </SortableContext>
+              )}
+            </div>
+          </DndContext>
         )}
       </div>
 

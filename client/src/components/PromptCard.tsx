@@ -3,6 +3,8 @@ import type { Prompt } from '../types/types';
 import { formatRelativeDate } from '../utils/dateUtils';
 import { usePrompts } from '../context/PromptContext';
 import { useToast } from '../context/ToastContext';
+import { useSortable } from '@dnd-kit/sortable';
+import { CSS } from '@dnd-kit/utilities';
 import { 
   Star, 
   Pin, 
@@ -18,6 +20,7 @@ interface PromptCardProps {
   onClick: () => void;
   onEdit: () => void;
   onDelete: () => void;
+  isDraggable?: boolean;
 }
 
 export const PromptCard: React.FC<PromptCardProps> = ({
@@ -25,9 +28,30 @@ export const PromptCard: React.FC<PromptCardProps> = ({
   onClick,
   onEdit,
   onDelete,
+  isDraggable = true,
 }) => {
   const { toggleFavorite, togglePin, addPrompt } = usePrompts();
   const { showToast } = useToast();
+
+  const {
+    attributes,
+    listeners,
+    setNodeRef,
+    setActivatorNodeRef,
+    transform,
+    transition,
+    isDragging,
+  } = useSortable({ 
+    id: prompt.id,
+    disabled: !isDraggable,
+  });
+
+  const style = {
+    transform: CSS.Transform.toString(transform),
+    transition,
+    opacity: isDragging ? 0.5 : 1,
+    zIndex: isDragging ? 10 : 1,
+  };
 
   const handleCopy = (e: React.MouseEvent) => {
     e.stopPropagation();
@@ -74,7 +98,9 @@ export const PromptCard: React.FC<PromptCardProps> = ({
 
   return (
     <div 
-      className={`group flex flex-col bg-white dark:bg-[#111] rounded border ${prompt.isPinned ? 'border-slate-400 dark:border-zinc-500 shadow-sm' : 'border-slate-200 dark:border-zinc-800'} overflow-hidden transition-all hover:border-slate-300 dark:hover:border-zinc-600 cursor-pointer h-[280px]`}
+      ref={setNodeRef}
+      style={style}
+      className={`group flex flex-col bg-white dark:bg-[#111] rounded border ${prompt.isPinned ? 'border-slate-400 dark:border-zinc-500 shadow-sm' : 'border-slate-200 dark:border-zinc-800'} overflow-hidden transition-colors hover:border-slate-300 dark:hover:border-zinc-600 cursor-pointer h-[280px] ${isDragging ? 'shadow-lg border-blue-500/50' : ''}`}
       onClick={onClick}
     >
       <div className="flex-1 p-5 flex flex-col">
@@ -135,10 +161,13 @@ export const PromptCard: React.FC<PromptCardProps> = ({
       >
         <div className="flex items-center gap-1">
           <button 
-            className="p-1.5 text-slate-400 hover:text-slate-700 dark:hover:text-zinc-200 transition-colors"
-            title="Drag to reorder"
+            ref={setActivatorNodeRef}
+            {...listeners}
+            {...attributes}
+            className={`p-1.5 transition-colors ${isDraggable ? 'text-slate-400 hover:text-slate-700 dark:hover:text-zinc-200 cursor-grab active:cursor-grabbing' : 'text-slate-300 dark:text-zinc-700 cursor-not-allowed'}`}
+            title={isDraggable ? "Drag to reorder" : "Reordering disabled while filtered"}
             aria-label="Drag to reorder"
-            style={{ cursor: 'grab' }}
+            disabled={!isDraggable}
           >
             <GripVertical className="w-4 h-4" />
           </button>
