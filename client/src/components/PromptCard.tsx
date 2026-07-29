@@ -1,6 +1,6 @@
 import React from 'react';
 import type { Prompt } from '../types/types';
-import { formatRelativeDate, formatDate } from '../utils/dateUtils';
+import { formatDate } from '../utils/dateUtils';
 import { getCategoryBadgeColors } from '../utils/badgeColors';
 import { usePrompts } from '../context/PromptContext';
 import { useToast } from '../context/ToastContext';

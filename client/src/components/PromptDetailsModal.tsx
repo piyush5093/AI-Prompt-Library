@@ -1,6 +1,6 @@
 import React, { useEffect, useRef } from 'react';
 import type { Prompt } from '../types/types';
-import { formatRelativeDate, formatDate } from '../utils/dateUtils';
+import { formatDate } from '../utils/dateUtils';
 import { useToast } from '../context/ToastContext';
 import { Copy, Edit2, X } from 'lucide-react';
 
