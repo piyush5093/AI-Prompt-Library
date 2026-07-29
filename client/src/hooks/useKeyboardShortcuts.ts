@@ -27,8 +27,8 @@ export const useKeyboardShortcuts = ({ onNewPrompt, onEscape }: KeyboardShortcut
       // Ignore other shortcuts when user is actively typing in a text field
       if (isInput) return;
 
-      // Ctrl + N or Cmd + N (macOS support)
-      if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'n') {
+      // Alt + N
+      if (e.altKey && e.key.toLowerCase() === 'n') {
         if (onNewPrompt) {
           e.preventDefault();
           onNewPrompt();
