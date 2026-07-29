@@ -1,6 +1,6 @@
 import React, { useEffect, useRef } from 'react';
 import type { Prompt } from '../types/types';
-import { formatRelativeDate } from '../utils/dateUtils';
+import { formatRelativeDate, formatDate } from '../utils/dateUtils';
 import { useToast } from '../context/ToastContext';
 import { Copy, Edit2, X } from 'lucide-react';
 
@@ -68,17 +68,17 @@ export const PromptDetailsModal: React.FC<PromptDetailsModalProps> = ({
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-0 md:p-4 overflow-y-auto">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-0 md:p-4 overflow-y-auto transition-opacity duration-200">
       <div 
         ref={modalRef}
-        className="bg-white dark:bg-[#111] w-full h-full md:h-auto md:max-w-2xl md:rounded border-0 md:border border-slate-200 dark:border-zinc-800 p-6 shadow-xl relative overflow-y-auto flex flex-col"
+        className="bg-white dark:bg-[#131313] w-full h-full md:h-auto md:max-w-2xl md:rounded-lg border-0 md:border border-zinc-200 dark:border-zinc-800 p-6 shadow-xl relative overflow-y-auto flex flex-col transform transition-transform duration-200 scale-100"
         role="dialog"
         aria-modal="true"
       >
         <button
           ref={closeBtnRef}
           onClick={onClose}
-          className="absolute top-4 right-4 text-slate-400 hover:text-slate-600 dark:hover:text-zinc-200 transition-colors p-1"
+          className="absolute top-4 right-4 text-zinc-500 hover:text-zinc-600 dark:hover:text-zinc-200 transition-colors p-1"
           aria-label="Close details modal"
         >
           <X className="w-5 h-5" />
@@ -86,7 +86,7 @@ export const PromptDetailsModal: React.FC<PromptDetailsModalProps> = ({
 
         <div className="mb-4">
           <div className="flex items-center gap-3 mb-2 pr-8">
-            <h2 className="text-2xl font-bold text-slate-900 dark:text-zinc-50 leading-tight">
+            <h2 className="text-2xl font-bold text-zinc-900 dark:text-zinc-50 leading-tight">
               {prompt.title}
             </h2>
             {prompt.isFavorite && (
@@ -95,29 +95,33 @@ export const PromptDetailsModal: React.FC<PromptDetailsModalProps> = ({
               </span>
             )}
             {prompt.isPinned && (
-              <span className="text-xs font-semibold bg-slate-200 border border-slate-300 dark:bg-zinc-800 dark:border-zinc-700 text-slate-700 dark:text-zinc-300 px-2 py-0.5 rounded">
+              <span className="text-xs font-semibold bg-zinc-100 border border-zinc-200 dark:bg-zinc-800 dark:border-zinc-700 text-zinc-700 dark:text-zinc-300 px-2 py-0.5 rounded">
                 Pinned
               </span>
             )}
           </div>
-          <div className="flex flex-wrap items-center gap-x-2 gap-y-1 text-xs text-slate-500 dark:text-zinc-500 mb-4">
-            <span className="px-2 py-0.5 bg-slate-100 dark:bg-zinc-800 text-slate-600 dark:text-zinc-400 rounded border border-slate-200 dark:border-zinc-700">
+          <div className="flex flex-wrap items-center gap-x-2 gap-y-1 text-xs text-zinc-500 dark:text-zinc-500 mb-4">
+            <span className="px-2 py-0.5 bg-zinc-100 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-400 rounded border border-zinc-200 dark:border-zinc-700">
               {prompt.category}
             </span>
             <span>•</span>
-            <span>Created {formatRelativeDate(prompt.createdAt)}</span>
-            <span>•</span>
-            <span>Updated {formatRelativeDate(prompt.updatedAt)}</span>
+            <span>Created {formatDate(prompt.createdAt)}</span>
+            {prompt.updatedAt !== prompt.createdAt && (
+              <>
+                <span>•</span>
+                <span>Updated {formatDate(prompt.updatedAt)}</span>
+              </>
+            )}
           </div>
           {prompt.description && (
-            <p className="text-sm text-slate-600 dark:text-zinc-400 mb-4">
+            <p className="text-sm text-zinc-600 dark:text-zinc-400 mb-4 leading-relaxed">
               {prompt.description}
             </p>
           )}
         </div>
 
-        <div className="bg-slate-50 dark:bg-[#0a0a0a] border border-slate-200 dark:border-zinc-800 rounded p-4 mb-4">
-          <pre className="text-sm text-slate-800 dark:text-zinc-200 whitespace-pre-wrap font-sans">
+        <div className="bg-zinc-50 dark:bg-[#0a0a0a] border border-zinc-200 dark:border-zinc-800/80 rounded-lg p-4 mb-4">
+          <pre className="text-sm text-zinc-800 dark:text-zinc-200 whitespace-pre-wrap font-sans leading-relaxed">
             {prompt.content}
           </pre>
         </div>
@@ -125,17 +129,17 @@ export const PromptDetailsModal: React.FC<PromptDetailsModalProps> = ({
         {prompt.tags && prompt.tags.length > 0 && (
           <div className="flex flex-wrap gap-2 mb-6">
             {prompt.tags.map(tag => (
-              <span key={tag} className="text-xs bg-slate-100 dark:bg-zinc-800 text-slate-600 dark:text-zinc-400 px-2 py-1 rounded">
+              <span key={tag} className="text-xs bg-zinc-100 dark:bg-zinc-800/50 border border-zinc-200 dark:border-zinc-700/50 text-zinc-600 dark:text-zinc-400 px-2 py-1 rounded">
                 #{tag}
               </span>
             ))}
           </div>
         )}
 
-        <div className="flex justify-end gap-3 pt-4 border-t border-slate-100 dark:border-zinc-800">
+        <div className="flex justify-end gap-3 pt-4 border-t border-zinc-200 dark:border-zinc-800">
           <button
             onClick={handleCopy}
-            className="flex items-center gap-2 px-4 py-2 text-sm font-medium rounded text-slate-700 dark:text-zinc-300 hover:bg-slate-100 dark:hover:bg-zinc-800 transition-colors"
+            className="flex items-center gap-2 px-4 py-2 text-sm font-medium rounded text-zinc-700 dark:text-zinc-300 hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors"
           >
             <Copy className="w-4 h-4" />
             Copy
@@ -145,7 +149,7 @@ export const PromptDetailsModal: React.FC<PromptDetailsModalProps> = ({
               onClose();
               onEdit();
             }}
-            className="flex items-center gap-2 px-4 py-2 text-sm font-medium rounded bg-slate-700 hover:bg-slate-800 dark:bg-zinc-800 dark:hover:bg-zinc-700 text-white transition-colors"
+            className="flex items-center gap-2 px-4 py-2 text-sm font-medium rounded bg-amber-500 hover:bg-amber-600 text-white transition-colors"
           >
             <Edit2 className="w-4 h-4" />
             Edit

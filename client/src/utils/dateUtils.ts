@@ -13,7 +13,27 @@ export const formatRelativeDate = (dateString: string): string => {
   
   const diffInDays = Math.floor(diffInHours / 24);
   if (diffInDays === 1) return 'Yesterday';
-  if (diffInDays < 7) return `${diffInDays} days ago`;
+  if (diffInDays < 7) return `${diffInDays}d ago`;
   
-  return date.toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' });
+  return formatDate(dateString);
+};
+
+export const formatDate = (dateString: string): string => {
+  const date = new Date(dateString);
+  return date.toLocaleDateString('en-US', { 
+    month: 'short', 
+    day: 'numeric', 
+    year: 'numeric' 
+  });
+};
+
+export const formatDateTime = (dateString: string): string => {
+  const date = new Date(dateString);
+  return date.toLocaleDateString('en-US', { 
+    month: 'short', 
+    day: 'numeric', 
+    year: 'numeric',
+    hour: 'numeric',
+    minute: '2-digit'
+  });
 };

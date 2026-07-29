@@ -75,7 +75,7 @@ export const deletePrompt = async (req: Request, res: Response): Promise<void> =
 
 export const reorderPrompts = async (req: Request, res: Response): Promise<void> => {
   try {
-    const { updates } = req.body;
+    const updates = req.body;
     
     if (!Array.isArray(updates)) {
       res.status(400).json({ error: 'Updates must be an array' });

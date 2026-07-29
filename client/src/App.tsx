@@ -27,7 +27,7 @@ function App() {
     <ThemeProvider>
       <ToastProvider>
         <PromptProvider>
-          <div className="min-h-screen bg-white dark:bg-[#0a0a0a] flex flex-col font-sans transition-colors duration-200">
+          <div className="min-h-screen bg-stone-50 text-zinc-900 dark:bg-[#0a0a0a] dark:text-zinc-100 flex flex-col font-sans transition-colors duration-300">
             <ToastContainer />
             <PromptFormModal isOpen={isFormOpen} onClose={() => setIsFormOpen(false)} initialData={null} />
             <Navbar 

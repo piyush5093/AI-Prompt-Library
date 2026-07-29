@@ -24,14 +24,14 @@ export const DeleteConfirmDialog: React.FC<DeleteConfirmDialogProps> = ({
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm transition-opacity duration-200">
       <div 
-        className="bg-white dark:bg-[#111] border border-slate-200 dark:border-zinc-800 rounded p-6 shadow-xl w-full max-w-sm"
+        className="bg-white dark:bg-[#131313] border border-zinc-200 dark:border-zinc-800/80 rounded-lg p-6 shadow-xl w-full max-w-sm transform transition-transform duration-200 scale-100"
         role="dialog"
         aria-modal="true"
       >
-        <h3 className="text-lg font-bold text-slate-900 dark:text-zinc-100 mb-2">Delete Prompt?</h3>
-        <p className="text-sm text-slate-600 dark:text-zinc-400 mb-6">
+        <h3 className="text-lg font-bold text-zinc-900 dark:text-zinc-100 mb-2">Delete Prompt?</h3>
+        <p className="text-sm text-zinc-600 dark:text-zinc-400 mb-6">
           Are you sure you want to delete this prompt? This action cannot be undone.
         </p>
         <div className="flex justify-end gap-3">
@@ -39,7 +39,7 @@ export const DeleteConfirmDialog: React.FC<DeleteConfirmDialogProps> = ({
             ref={cancelBtnRef}
             onClick={onCancel}
             disabled={isDeleting}
-            className="px-4 py-2 text-sm font-medium rounded text-slate-700 dark:text-zinc-300 hover:bg-slate-100 dark:hover:bg-zinc-800 transition-colors disabled:opacity-50"
+            className="px-4 py-2 text-sm font-medium rounded text-zinc-700 dark:text-zinc-300 hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors disabled:opacity-50"
           >
             Cancel
           </button>

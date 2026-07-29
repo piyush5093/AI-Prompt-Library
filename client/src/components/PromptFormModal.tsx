@@ -153,22 +153,22 @@ export const PromptFormModal: React.FC<PromptFormModalProps> = ({
   const isEditing = !!initialData;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-0 md:p-4 overflow-y-auto">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-0 md:p-4 overflow-y-auto transition-opacity duration-200">
       <div 
         ref={modalRef}
-        className="bg-white dark:bg-[#111] w-full h-full md:h-auto md:max-w-2xl md:rounded border-0 md:border border-slate-200 dark:border-zinc-800 p-6 shadow-xl relative overflow-y-auto flex flex-col justify-between md:justify-start"
+        className="bg-white dark:bg-[#131313] w-full h-full md:h-auto md:max-w-2xl md:rounded-lg border-0 md:border border-zinc-200 dark:border-zinc-800 p-6 shadow-xl relative overflow-y-auto flex flex-col justify-between md:justify-start transform transition-transform duration-200 scale-100"
         role="dialog"
         aria-modal="true"
       >
         <button
           onClick={onClose}
-          className="absolute top-4 right-4 text-slate-400 hover:text-slate-600 dark:hover:text-zinc-200 transition-colors p-1"
+          className="absolute top-4 right-4 text-zinc-500 hover:text-zinc-700 dark:hover:text-zinc-200 transition-colors p-1"
           aria-label="Close modal"
         >
           &times;
         </button>
 
-        <h2 className="text-xl font-bold text-slate-900 dark:text-zinc-50 mb-6">
+        <h2 className="text-xl font-bold text-zinc-900 dark:text-zinc-50 mb-6">
           {isEditing ? 'Edit Prompt' : 'New Prompt'}
         </h2>
 
@@ -180,7 +180,7 @@ export const PromptFormModal: React.FC<PromptFormModalProps> = ({
 
         <form onSubmit={handleSubmit} className="flex flex-col gap-4">
           <div>
-            <label className="block text-sm font-semibold text-slate-700 dark:text-zinc-300 mb-1">
+            <label className="block text-sm font-semibold text-zinc-700 dark:text-zinc-300 mb-1">
               Title *
             </label>
             <input
@@ -189,7 +189,7 @@ export const PromptFormModal: React.FC<PromptFormModalProps> = ({
               value={title}
               onChange={e => setTitle(e.target.value)}
               onBlur={() => handleBlur('title')}
-              className={`w-full px-3 py-2 border rounded bg-slate-50 dark:bg-[#0a0a0a] text-slate-900 dark:text-zinc-100 placeholder-slate-400 dark:placeholder-zinc-600 focus:outline-none focus:ring-1 ${touched.title && errors.title ? 'border-red-500 focus:ring-red-500' : 'border-slate-300 dark:border-zinc-700 focus:border-blue-500 focus:ring-blue-500'}`}
+              className={`w-full px-3 py-2 border rounded bg-zinc-50 dark:bg-[#0a0a0a] text-zinc-900 dark:text-zinc-100 placeholder-zinc-400 dark:placeholder-zinc-600 focus:outline-none focus:ring-1 transition-colors ${touched.title && errors.title ? 'border-red-500 focus:ring-red-500' : 'border-zinc-300 dark:border-zinc-700 focus:border-amber-500 focus:ring-amber-500'}`}
               placeholder="E.g., Generate React Component"
             />
             {touched.title && errors.title && (
@@ -198,7 +198,7 @@ export const PromptFormModal: React.FC<PromptFormModalProps> = ({
           </div>
 
           <div>
-            <label className="block text-sm font-semibold text-slate-700 dark:text-zinc-300 mb-1">
+            <label className="block text-sm font-semibold text-zinc-700 dark:text-zinc-300 mb-1">
               Content *
             </label>
             <textarea
@@ -206,7 +206,7 @@ export const PromptFormModal: React.FC<PromptFormModalProps> = ({
               onChange={e => setContent(e.target.value)}
               onBlur={() => handleBlur('content')}
               rows={6}
-              className={`w-full px-3 py-2 border rounded bg-slate-50 dark:bg-[#0a0a0a] text-slate-900 dark:text-zinc-100 placeholder-slate-400 dark:placeholder-zinc-600 focus:outline-none focus:ring-1 ${touched.content && errors.content ? 'border-red-500 focus:ring-red-500' : 'border-slate-300 dark:border-zinc-700 focus:border-blue-500 focus:ring-blue-500'}`}
+              className={`w-full px-3 py-2 border rounded bg-zinc-50 dark:bg-[#0a0a0a] text-zinc-900 dark:text-zinc-100 placeholder-zinc-400 dark:placeholder-zinc-600 focus:outline-none focus:ring-1 transition-colors ${touched.content && errors.content ? 'border-red-500 focus:ring-red-500' : 'border-zinc-300 dark:border-zinc-700 focus:border-amber-500 focus:ring-amber-500'}`}
               placeholder="Enter the actual prompt text here..."
             />
             {touched.content && errors.content && (
@@ -216,14 +216,14 @@ export const PromptFormModal: React.FC<PromptFormModalProps> = ({
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
-              <label className="block text-sm font-semibold text-slate-700 dark:text-zinc-300 mb-1">
+              <label className="block text-sm font-semibold text-zinc-700 dark:text-zinc-300 mb-1">
                 Category *
               </label>
               <select
                 value={category}
                 onChange={e => setCategory(e.target.value)}
                 onBlur={() => handleBlur('category')}
-                className={`w-full px-3 py-2 border rounded bg-slate-50 dark:bg-[#0a0a0a] text-slate-900 dark:text-zinc-100 focus:outline-none focus:ring-1 ${touched.category && errors.category ? 'border-red-500 focus:ring-red-500' : 'border-slate-300 dark:border-zinc-700 focus:border-blue-500 focus:ring-blue-500'}`}
+                className={`w-full px-3 py-2 border rounded bg-zinc-50 dark:bg-[#0a0a0a] text-zinc-900 dark:text-zinc-100 focus:outline-none focus:ring-1 transition-colors ${touched.category && errors.category ? 'border-red-500 focus:ring-red-500' : 'border-zinc-300 dark:border-zinc-700 focus:border-amber-500 focus:ring-amber-500'}`}
               >
                 <option value="" disabled>Select a category</option>
                 {CATEGORIES.map(c => (
@@ -236,28 +236,28 @@ export const PromptFormModal: React.FC<PromptFormModalProps> = ({
             </div>
 
             <div>
-              <label className="block text-sm font-semibold text-slate-700 dark:text-zinc-300 mb-1">
+              <label className="block text-sm font-semibold text-zinc-700 dark:text-zinc-300 mb-1">
                 Tags (comma separated)
               </label>
               <input
                 type="text"
                 value={tags}
                 onChange={e => setTags(e.target.value)}
-                className="w-full px-3 py-2 border border-slate-300 dark:border-zinc-700 rounded bg-slate-50 dark:bg-[#0a0a0a] text-slate-900 dark:text-zinc-100 placeholder-slate-400 dark:placeholder-zinc-600 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
+                className="w-full px-3 py-2 border border-zinc-300 dark:border-zinc-700 rounded bg-zinc-50 dark:bg-[#0a0a0a] text-zinc-900 dark:text-zinc-100 placeholder-zinc-400 dark:placeholder-zinc-600 focus:outline-none focus:border-amber-500 focus:ring-1 focus:ring-amber-500 transition-colors"
                 placeholder="react, frontend, hooks"
               />
             </div>
           </div>
 
           <div>
-            <label className="block text-sm font-semibold text-slate-700 dark:text-zinc-300 mb-1">
+            <label className="block text-sm font-semibold text-zinc-700 dark:text-zinc-300 mb-1">
               Description (optional)
             </label>
             <input
               type="text"
               value={description}
               onChange={e => setDescription(e.target.value)}
-              className="w-full px-3 py-2 border border-slate-300 dark:border-zinc-700 rounded bg-slate-50 dark:bg-[#0a0a0a] text-slate-900 dark:text-zinc-100 placeholder-slate-400 dark:placeholder-zinc-600 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
+              className="w-full px-3 py-2 border border-zinc-300 dark:border-zinc-700 rounded bg-zinc-50 dark:bg-[#0a0a0a] text-zinc-900 dark:text-zinc-100 placeholder-zinc-400 dark:placeholder-zinc-600 focus:outline-none focus:border-amber-500 focus:ring-1 focus:ring-amber-500 transition-colors"
               placeholder="Brief summary of what this does"
             />
           </div>
@@ -267,14 +267,14 @@ export const PromptFormModal: React.FC<PromptFormModalProps> = ({
               type="button"
               onClick={onClose}
               disabled={isSubmitting}
-              className="px-4 py-2 text-sm font-medium rounded text-slate-700 dark:text-zinc-300 hover:bg-slate-100 dark:hover:bg-zinc-800 transition-colors disabled:opacity-50"
+              className="px-4 py-2 text-sm font-medium rounded text-zinc-700 dark:text-zinc-300 hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors disabled:opacity-50"
             >
               Cancel
             </button>
             <button
               type="submit"
               disabled={isSubmitting}
-              className="px-4 py-2 text-sm font-medium rounded bg-slate-700 hover:bg-slate-800 dark:bg-zinc-800 dark:hover:bg-zinc-700 text-white transition-colors disabled:opacity-50 flex items-center justify-center min-w-[100px]"
+              className="px-4 py-2 text-sm font-medium rounded bg-amber-500 hover:bg-amber-600 text-white transition-colors disabled:opacity-50 flex items-center justify-center min-w-[100px]"
             >
               {isSubmitting ? (
                 <span className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></span>

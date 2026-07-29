@@ -1,7 +1,7 @@
 import { useMemo } from 'react';
 import type { Prompt } from '../types/types';
 
-export type SortOption = 'newest' | 'oldest' | 'a-z' | 'z-a';
+export type SortOption = 'newest' | 'oldest' | 'a-z' | 'z-a' | 'custom';
 
 export function useFilteredPrompts(
   prompts: Prompt[],
@@ -22,9 +22,10 @@ export function useFilteredPrompts(
       // Search term filter (title + content)
       if (searchTerm) {
         const lowerSearch = searchTerm.toLowerCase();
-        const titleMatch = p.title.toLowerCase().includes(lowerSearch);
-        const contentMatch = p.content.toLowerCase().includes(lowerSearch);
-        if (!titleMatch && !contentMatch) return false;
+        const titleMatch = p.title?.toLowerCase().includes(lowerSearch) || false;
+        const contentMatch = p.content?.toLowerCase().includes(lowerSearch) || false;
+        const tagsMatch = p.tags?.some(tag => tag.toLowerCase().includes(lowerSearch)) || false;
+        if (!titleMatch && !contentMatch && !tagsMatch) return false;
       }
       
       return true;
@@ -45,6 +46,8 @@ export function useFilteredPrompts(
           return a.title.localeCompare(b.title);
         case 'z-a':
           return b.title.localeCompare(a.title);
+        case 'custom':
+          return (a.order ?? 0) - (b.order ?? 0);
         default:
           return 0;
       }
