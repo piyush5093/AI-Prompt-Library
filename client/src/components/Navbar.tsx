@@ -4,7 +4,7 @@ import { usePrompts } from '../context/PromptContext';
 import { useToast } from '../context/ToastContext';
 import { exportPrompts } from '../utils/exportPrompts';
 import { importPrompts } from '../utils/importPrompts';
-import { Download, Upload, Menu } from 'lucide-react';
+import { Download, Upload, Menu, Moon, Sun, Plus } from 'lucide-react';
 
 interface NavbarProps {
   onNewClick: () => void;
@@ -108,15 +108,18 @@ export const Navbar: React.FC<NavbarProps> = ({ onNewClick, onToggleSidebar }) =
 
         <button
           onClick={toggleTheme}
-          className="p-2 rounded border border-zinc-200 dark:border-zinc-800 hover:bg-zinc-100 dark:hover:bg-zinc-800/50 text-zinc-700 dark:text-zinc-300 transition-colors duration-150 text-sm font-medium"
+          className="p-2 rounded border border-zinc-200 dark:border-zinc-800 hover:bg-zinc-100 dark:hover:bg-zinc-800/50 text-zinc-700 dark:text-zinc-300 transition-colors duration-150 text-sm font-medium flex items-center justify-center"
+          title="Toggle Theme"
+          aria-label="Toggle Theme"
         >
-          {theme === 'light' ? 'Dark Mode' : 'Light Mode'}
+          {theme === 'light' ? <Moon className="w-4 h-4" /> : <Sun className="w-4 h-4" />}
         </button>
         <button 
           onClick={onNewClick}
-          className="bg-amber-500 hover:bg-amber-600 text-white font-medium py-2 px-4 rounded text-sm transition-colors duration-150 ml-2"
+          className="bg-amber-500 hover:bg-amber-600 text-white font-medium py-2 px-3 sm:px-4 rounded text-sm transition-colors duration-150 ml-1 sm:ml-2 flex items-center gap-1.5"
         >
-          New Prompt
+          <Plus className="w-4 h-4 sm:hidden" />
+          <span className="hidden sm:inline">New Prompt</span>
         </button>
       </div>
     </header>

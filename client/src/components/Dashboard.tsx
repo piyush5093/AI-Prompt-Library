@@ -151,8 +151,8 @@ export const Dashboard: React.FC<DashboardProps> = ({
   const unpinnedPrompts = filteredPrompts.filter(p => !p.isPinned);
 
   return (
-    <div className="flex-1 p-8 overflow-y-auto bg-stone-50 dark:bg-[#0a0a0a] text-zinc-900 dark:text-zinc-200 transition-colors duration-300">
-      <div className="flex justify-between items-end mb-8 gap-4">
+    <div className="flex-1 p-4 md:p-8 overflow-y-auto bg-stone-50 dark:bg-[#0a0a0a] text-zinc-900 dark:text-zinc-200 transition-colors duration-300">
+      <div className="flex flex-col md:flex-row justify-between items-start md:items-end mb-8 gap-4">
         <div>
           <h2 className="text-2xl font-bold tracking-tight text-slate-900 dark:text-zinc-50">
             Dashboard
@@ -162,7 +162,7 @@ export const Dashboard: React.FC<DashboardProps> = ({
           </p>
         </div>
         
-        <div className="flex items-center gap-4 flex-1 justify-end max-w-2xl">
+        <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-4 w-full md:flex-1 md:justify-end max-w-2xl">
           <SearchBar value={searchTerm} onChange={setSearchTerm} />
           
           <select
